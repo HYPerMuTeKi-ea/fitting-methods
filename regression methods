@@ -123,3 +123,43 @@ plt.legend()
 print(intercept,slope)
 # 显示图表
 plt.show()
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from scipy.stats import poisson
+
+# 你的数据
+data = np.array([你的数据数组])
+
+# 计算数据的直方图
+bins = np.arange(0, max(data) + 1.5) - 0.5
+hist, bin_edges = np.histogram(data, bins=bins, density=True)
+bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+
+# 定义泊松分布的概率质量函数
+def poisson_pmf(k, lamb):
+    return poisson.pmf(k, lamb)
+
+# 使用曲线拟合方法来估计λ（lambda）
+params, cov_matrix = curve_fit(poisson_pmf, bin_centers, hist, p0=[np.mean(data)])
+
+# 输出拟合的λ参数
+lambda_est = params[0]
+print(f"拟合出的 λ 参数: {lambda_est:.2f}")
+
+# 绘制直方图和拟合曲线
+plt.figure(figsize=(10, 6))
+plt.hist(data, bins=bins, density=True, alpha=0.6, color='g', label='Data')
+
+# 绘制拟合的泊松分布
+x_plot = np.arange(0, max(data) + 1)
+plt.plot(x_plot, poisson.pmf(x_plot, lambda_est), 'r-', lw=2, label=f'Poisson fit: λ={lambda_est:.2f}')
+
+# 添加图例和标签
+plt.title('Poisson Distribution Fit')
+plt.xlabel('Number of events')
+plt.ylabel('Probability')
+plt.legend()
+
+# 显示图表
+plt.show()
